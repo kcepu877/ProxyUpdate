@@ -37,7 +37,7 @@ def check_proxy(row, api_url_template):
 
 def main():
     input_file = os.getenv('IP_FILE', 'proxyip.txt')
-    output_file = 'iproxyip.txt'
+    update_file = 'update_proxyip.txt'
     error_file = 'error.txt'
     api_url_template = os.getenv('API_URL', 'https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip={ip}&host=speed.cloudflare.com&port={port}&tls=true')
 
@@ -63,11 +63,12 @@ def main():
                 error_logs.append(error)
 
     try:
-        with open(output_file, "w", newline="") as f:
+        # Write the alive proxies to the update file
+        with open(update_file, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(alive_proxies)
     except Exception as e:
-        print(f"Error menulis ke {output_file}: {e}")
+        print(f"Error menulis ke {update_file}: {e}")
         return
 
     if error_logs:
@@ -80,8 +81,9 @@ def main():
             print(f"Error menulis ke {error_file}: {e}")
             return
 
+    # Replace the original proxyip.txt with the update_proxyip.txt
     try:
-        shutil.move(output_file, input_file)
+        shutil.move(update_file, input_file)
         print(f"{input_file} telah diperbarui dengan proxy yang ALIVE.")
     except Exception as e:
         print(f"Error menggantikan {input_file}: {e}")
