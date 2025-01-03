@@ -30,7 +30,11 @@ jobs:
       run: |
         python update_proxy.py
 
-    - name: Print changes (No commit or push)
+    - name: Check if update_proxyip.txt exists
       run: |
-        echo "No commit or push performed in this step."
-        cat update_proxyip.txt  # Cek apakah file sudah terupdate
+        if [ -f "update_proxyip.txt" ]; then
+          echo "File update_proxyip.txt exists."
+          cat update_proxyip.txt
+        else
+          echo "File update_proxyip.txt not found!"
+        fi
