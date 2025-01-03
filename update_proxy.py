@@ -1,7 +1,7 @@
 import requests
 import csv
-import shutil
 import os
+import shutil
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def check_proxy(row, api_url_template):
@@ -36,9 +36,9 @@ def check_proxy(row, api_url_template):
         return (None, error_message)
 
 def main():
-    input_file = os.getenv('IP_FILE', 'proxyip.txt')
-    update_file = 'update_proxyip.txt'
-    error_file = 'error.txt'
+    input_file = os.getenv('IP_FILE', 'proxyip.txt')  # Baca file proxyip.txt
+    update_file = 'update_proxyip.txt'  # File untuk proxy yang ALIVE
+    error_file = 'error.txt'  # File untuk log error
     api_url_template = os.getenv('API_URL', 'https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip={ip}&host=speed.cloudflare.com&port={port}&tls=true')
 
     alive_proxies = []
@@ -62,15 +62,17 @@ def main():
             if error:
                 error_logs.append(error)
 
+    # Menulis proxy yang ALIVE ke update_proxyip.txt
     try:
-        # Write the alive proxies to the update file
         with open(update_file, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(alive_proxies)
+        print(f"Proxy yang ALIVE telah disimpan di {update_file}.")
     except Exception as e:
         print(f"Error menulis ke {update_file}: {e}")
         return
 
+    # Menulis log error ke error.txt jika ada
     if error_logs:
         try:
             with open(error_file, "w") as f:
@@ -80,13 +82,6 @@ def main():
         except Exception as e:
             print(f"Error menulis ke {error_file}: {e}")
             return
-
-    # Replace the original proxyip.txt with the update_proxyip.txt
-    try:
-        shutil.move(update_file, input_file)
-        print(f"{input_file} telah diperbarui dengan proxy yang ALIVE.")
-    except Exception as e:
-        print(f"Error menggantikan {input_file}: {e}")
 
 if __name__ == "__main__":
     main()
