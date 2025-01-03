@@ -2,8 +2,8 @@ name: Update Proxy IP
 
 on:
   schedule:
-    - cron: '0 0 */3 * *'
-  workflow_dispatch: 
+    - cron: '0 17 * * *'  # Setiap hari pukul 00:00 WIB (17:00 UTC)
+  workflow_dispatch:  # Memungkinkan untuk menjalankan manual melalui GitHub UI
 
 jobs:
   update-proxies:
@@ -23,12 +23,21 @@ jobs:
         python -m pip install --upgrade pip
         pip install requests
 
-    - name: Update proxy
+    - name: Update proxy ip
       env:
-        IP_FILE: 'proxyip.txt'
+        IP_FILE: 'proxyip.txt'  # File proxy yang akan diperiksa
         API_URL: 'https://p01--boiling-frame--kw6dd7bjv2nr.code.run/check?ip={ip}&host=speed.cloudflare.com&port={port}&tls=true'
       run: |
         python update_proxy.py
+
+    - name: Ensure update_proxyip.txt exists
+      run: |
+        if [ -f "update_proxyip.txt" ]; then
+          echo "File update_proxyip.txt exists."
+        else
+          echo "File update_proxyip.txt not found!"
+          exit 1  # Menghentikan proses jika file tidak ditemukan
+        fi
 
     - name: Commit and push changes
       run: |
